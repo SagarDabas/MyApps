@@ -11,7 +11,7 @@ import java.util.Map;
 import javax.swing.*;
 import utility.Extensions;
 import utility.MainPanel;
-import utility.NewsEdit;
+import utility.FileEdit;
 import utility.SearchFiles;
 import utility.Validator;
 
@@ -19,9 +19,11 @@ import utility.Validator;
  *
  * @author Sagar
  */
-public abstract class AbstractEditWindow<T extends FileInterface> extends JPanel {
+public abstract class AbstractEditWindow<T extends FileInterface> extends AbstractGUI {
 
-    private Class<T> fileClass;
+    private JPanel defaultWindow;
+    private final ArrayList<T> list;
+    private int index;
 
     /**
      *
@@ -29,32 +31,18 @@ public abstract class AbstractEditWindow<T extends FileInterface> extends JPanel
      * @param list
      * @param index
      */
-    public AbstractEditWindow(final ArrayList<T> list, int index, Class<T> fileClass) {
+    public AbstractEditWindow(final ArrayList<T> list, int index) {
         super();
-        this.fileClass = fileClass;
         this.list = list;
         this.index = index;
     }
 
     /**
      *
-     * @param yourEditWindow
-     */
-    protected final void addCustomGUI(final JComponent yourEditWindow) {
-        setLayout(new BorderLayout());
-        if (yourEditWindow == null) {
-            this.add(buttonsPanel(), BorderLayout.SOUTH);
-            this.add(defaultWindow(), BorderLayout.CENTER);
-        } else {
-            this.add(yourEditWindow, BorderLayout.CENTER);
-        }
-    }
-
-    /**
-     *
      * @return
      */
-    private JPanel defaultWindow() {
+    @Override
+    protected final JPanel defaultWindow() {
 
         defaultWindow = new JPanel();
         defaultWindow.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
@@ -82,7 +70,7 @@ public abstract class AbstractEditWindow<T extends FileInterface> extends JPanel
                 defaultWindow.add(label);
                 final JTextArea area = entry.getValue();
                 area.setLineWrap(true);
-                area.setPreferredSize(new Dimension((int) (0.96*MainPanel.panelSize.width), 100));
+                area.setPreferredSize(new Dimension((int) (0.96 * MainPanel.panelSize.width), 100));
                 JScrollPane jScrollPane = new JScrollPane();
                 jScrollPane.setViewportView(area);
                 defaultWindow.add(jScrollPane);
@@ -102,6 +90,7 @@ public abstract class AbstractEditWindow<T extends FileInterface> extends JPanel
     /**
      *
      */
+    @Override
     protected JComponent buttonsPanel() {
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 5));
@@ -127,9 +116,11 @@ public abstract class AbstractEditWindow<T extends FileInterface> extends JPanel
             @Override
             public void actionPerformed(final ActionEvent event) {
                 if (index != -1) {
-                    Extensions.infoWindowByDataClass(fileClass, list, index);
+//                    Class[] classes = {ArrayList.class, int.class};
+                    Object[] parameters = {list, index};
+                    Extensions.windowByName(infoWindow, parameters);
                 } else {
-                    Extensions.listWindowByDataClass(fileClass);
+                    Extensions.windowByName(listWindow);
                 }
             }
         });
@@ -144,9 +135,11 @@ public abstract class AbstractEditWindow<T extends FileInterface> extends JPanel
      */
     private void save() {
         final T data = initData();
-        final File file = Extensions.myFileByDataClass(fileClass);
-        index = NewsEdit.edit(index, file, list, data);
-        Extensions.infoWindowByDataClass(fileClass, list, index);
+        final File file = Extensions.getMyFile(fileName);
+        index = FileEdit.edit(index, file, list, data);
+//        Class[] classes = {ArrayList.class, int.class};
+        Object[] parameters = {list, index};
+        Extensions.windowByName(infoWindow, parameters);
     }
 
     /**
@@ -182,23 +175,9 @@ public abstract class AbstractEditWindow<T extends FileInterface> extends JPanel
         return null;
     }
 
-//    public final JPanel getButtonsPanel() {
-//        return buttonsPanel;
-//    }
-//
-//    public final JButton getSaveButton() {
-//        return saveButton;
-//    }
-//
-//    public final JButton getCancelButton() {
-//        return cancelButton;
-//    }
     public final JPanel getDefaultWindow() {
         return defaultWindow;
     }
-    private JPanel defaultWindow;
-    private final ArrayList<T> list;
-    private int index;
 
     /**
      * Sets the textfields, textareas and other inputs from the FileInterface
@@ -213,10 +192,4 @@ public abstract class AbstractEditWindow<T extends FileInterface> extends JPanel
      * @return FileInterface object.
      */
     public abstract T getFields();
-
-    /**
-     *
-     * @return Strings for the top and the sidebar.
-     */
-    public abstract String[] getString();
 }

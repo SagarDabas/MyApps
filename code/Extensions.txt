@@ -1,7 +1,0 @@
-ApplicationStart:Newslo
-Subscriber:Subscriber,SubscriberListWindow,SubscriberInfoWindow,SubscriberEditWindow,SubsFile
-Newsletter:Newsletter,NewsListWindow,NewsInfoWindow,NewsEditWindow,Letterfile
-Group:Group,GroupListWindow,GroupInfoWindow,GroupEditWindow,GrFile
-Settings:Msettings,SettingsListWindow,SettingsInfoWindow,SettingsEditWindow,SettingsFile
-Compose:Compose,ComposeListWindow,ComposeInfoWindow,ComposeEditWindow,LetterFile
-ApplicationEnd

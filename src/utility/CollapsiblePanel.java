@@ -95,7 +95,7 @@ public class CollapsiblePanel {
                 button.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent ae) {
-                        Extensions.listWindowByName(string);
+                        Extensions.windowByName(string);
                     }
                 });
                 buttonsPanel.add(button);
@@ -194,7 +194,7 @@ public class CollapsiblePanel {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                Extensions.listWindowByName(appName);
+                Extensions.windowByName(appName);
             }
         });
         return button;

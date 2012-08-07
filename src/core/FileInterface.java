@@ -37,13 +37,6 @@ public abstract class FileInterface implements Serializable {
         this.title = title;
     }
 
-    // This constructor is removedso that the instance fields can be deserialized with no argument constructors.
-//    /**
-//     * @param title the title to set
-//     */
-//    public FileInterface(String title) {
-//        this.title = title;
-//    }
     /**
      * ID of the log.
      */

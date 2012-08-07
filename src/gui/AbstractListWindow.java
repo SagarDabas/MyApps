@@ -1,7 +1,6 @@
 package gui;
 
 import core.FileInterface;
-import gui.newslo.GroupListWindow;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -9,7 +8,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 import utility.Extensions;
 import utility.MainPanel;
-import utility.NewsEdit;
+import utility.FileEdit;
 import utility.SearchFiles;
 
 /**
@@ -17,49 +16,26 @@ import utility.SearchFiles;
  * @author Sagar
  * @param <T>
  */
-public abstract class AbstractListWindow<T extends FileInterface> extends JPanel {
+public abstract class AbstractListWindow<T extends FileInterface> extends AbstractGUI {
 
     private JPanel listPanel;
     private ArrayList<T> list;
     private JCheckBox[] checkBoxes;
     private int selected;
     private MouseListener[] myMouseListeners;
-    private Class<T> fileClass;
     private JPanel rightPanel;
-
-    /**
-     *
-     * @return
-     */
-    public abstract String[] getString();
-
+    
     /*
      * Creates the GUI for the list read from the files. @param <T> T is the
      * type parameter which represent the type of the list. @param list
      * ArrayList for storing the list read from files.
      */
-    public AbstractListWindow(final ArrayList<T> list, final Class<T> fileClass) {
+    public AbstractListWindow(final ArrayList<T> list) {
         this.list = list;
-        this.fileClass = fileClass;
     }
 
-    /**
-     *
-     * @param yourListWindow
-     */
-    protected final void addCustomGUI(final JComponent yourListWindow) {
-        setLayout(new BorderLayout());
-
-        if (yourListWindow == null) {
-            //Add the bottom buttons panel.
-            this.add(buttonsPanel(), BorderLayout.SOUTH);
-            this.add(defaultWindow(), BorderLayout.CENTER);
-        } else {
-            this.add(yourListWindow, BorderLayout.CENTER);
-        }
-    }
-
-    private JComponent defaultWindow() {
+    @Override
+    protected final JPanel defaultWindow() {
         //Paints the listPanel.
         initListGUI(list);
 
@@ -169,7 +145,7 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
         JPanel buttonsPanel;
         buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        buttonsPanel.setPreferredSize(new Dimension((int) (MainPanel.panelSize.width)-30, 40));
+        buttonsPanel.setPreferredSize(new Dimension((int) (MainPanel.panelSize.width) - 30, 40));
 
         checkBoxes[index] = new JCheckBox();
         buttonsPanel.add(checkBoxes[index]);
@@ -181,7 +157,7 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
         nameButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         nameButton.setText(data.getTitle());
         nameButton.setFont(MainPanel.font);
-        
+
         class MouseAdapterImpl extends MouseAdapter {
 
             @Override
@@ -211,7 +187,7 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
         //Optional right panel , displayed along the names on the list.
         rightPanel = new JPanel();
         rightPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 7));
-        rightPanel.setPreferredSize(new Dimension(MainPanel.panelSize.width - nameButton.getPreferredSize().width-70, 40));
+        rightPanel.setPreferredSize(new Dimension(MainPanel.panelSize.width - nameButton.getPreferredSize().width - 70, 40));
         //Optional right panel , displayed along the names on the list.
         JPanel panel = getRightPanel(data);
         if (panel != null) {
@@ -219,7 +195,7 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
             rightPanel.add(panel);
         }
         buttonsPanel.add(rightPanel);
-        
+
         return buttonsPanel;
     }
 
@@ -268,6 +244,7 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
      * @param fileClass
      * @return
      */
+    @Override
     protected JComponent buttonsPanel() {
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 5));
@@ -297,7 +274,7 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
                         int fileid = SearchFiles.searchByName(list);
                         if (fileid != -1) {
                             if (deleteButtonListener(fileid)) {
-                                Extensions.listWindowByDataClass(fileClass);
+                                Extensions.windowByName(listWindow);
                             }
                         }
                     }
@@ -328,11 +305,11 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
      *
      */
     protected void createButtonListener() {
-        if (!NewsEdit.groupList.isEmpty() || (AbstractListWindow.this instanceof GroupListWindow)) {
-            Extensions.editWindowByDataClass(fileClass, list, -1);
-        } else {
-            JOptionPane.showMessageDialog(null, "Please, first create a group.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+//        if (!FileEdit.groupList.isEmpty() || (AbstractListWindow.this instanceof GroupListWindow)) {
+        Extensions.windowByName(editWindow,list,-1);
+//        } else {
+//            JOptionPane.showMessageDialog(null, "Please, first create a group.", "Error", JOptionPane.ERROR_MESSAGE);
+//        }
     }
 
     /**
@@ -340,8 +317,8 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
      * @param index
      */
     protected boolean deleteButtonListener(int index) {
-        File file = Extensions.myFileByDataClass(fileClass);
-        return NewsEdit.delete(index, file, list, selected);
+        File file = Extensions.getMyFile(fileName);
+        return FileEdit.delete(index, file, list, selected);
     }
 
     /**
@@ -349,7 +326,7 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
      * @param index
      */
     protected void nameButtonListener(int index) {
-        Extensions.infoWindowByDataClass(fileClass, list, index);
+        Extensions.windowByName(infoWindow,list,index);
     }
 
     /**
@@ -379,11 +356,12 @@ public abstract class AbstractListWindow<T extends FileInterface> extends JPanel
                         x++;
                     }
                 }
-                Extensions.listWindowByDataClass(fileClass);
+                Extensions.windowByName(listWindow);
             } else {
                 selected = 2;
             }
         }
         return selected;
     }
+
 }

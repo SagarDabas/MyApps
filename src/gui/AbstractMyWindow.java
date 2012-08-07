@@ -120,7 +120,7 @@ public abstract class AbstractMyWindow extends JPanel {
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent me) {
-                Extensions.listWindowByName(myWindow);
+                Extensions.windowByName(myWindow);
                 mouseExited(me);
             }
 

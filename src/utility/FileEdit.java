@@ -1,31 +1,11 @@
 package utility;
 
 import core.FileInterface;
-import core.FileInterface;
-import core.newslo.Group;
-import core.newslo.Log;
-import core.newslo.Msettings;
-import core.newslo.Newsletter;
-import core.newslo.Subscriber;
 import java.io.*;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
-public class  NewsEdit {
-
-    public static ArrayList<Newsletter> letterList;
-    public static ArrayList<Group> groupList;
-    public static ArrayList<Subscriber> subsList;
-    public static ArrayList<Log> logList;
-    public static ArrayList<Msettings> settingsList;
-
-    public static void readFiles() {
-        letterList = readFile(new File("Letterfile"));
-        groupList = readFile(new File("Grfile"));        //(ArrayList<Group>)(ArrayList<T>)readFile(new File("Grfile")); also works?? Why??
-        subsList = readFile(new File("Subsfile"));
-        logList = readFile(new File("Logfile"));
-        settingsList = readFile(new File("Settingsfile"));
-    }
+public class  FileEdit {
 
     public static ArrayList readFile(File file) {
         ArrayList List = new ArrayList();
