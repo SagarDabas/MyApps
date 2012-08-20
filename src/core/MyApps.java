@@ -38,15 +38,21 @@ public class MyApps extends JFrame {
         setTitle("MyApps");
         setFont(MainPanel.font);
 
+        //Initialize mainpanel
         JPanel initMainPanel = MainPanel.initMainPanel();
         add(initMainPanel);
 
+        //initialize collapsible panel.
         JLayeredPane layeredPane = CollapsiblePanel.setHiddenPanel();
 
+        //initiliaze all the windows by reading Extensions.txt
+        Extensions.initWindows();
+        
         //Default window when program is started.
-        final ArrayList<AbstractMyWindow> myWindows = Extensions.getMyWindows();
-        MainPanel.changePanel(myWindows.get(0), myWindows.get(0).getString());
+        AbstractMyWindow defaultWindow = Extensions.myWindows.get("Newslo");
+        MainPanel.changePanel(defaultWindow, defaultWindow.getString());
 
+        //If the layer is not set then it might go behind when the window is repainted.
         getLayeredPane().setLayer(layeredPane, 400);
         getLayeredPane().add(layeredPane);
     }

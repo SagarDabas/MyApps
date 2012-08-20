@@ -17,65 +17,26 @@ import java.util.logging.Logger;
  */
 public class Extensions {
 
-    private static HashMap<String, Integer> myApps;
-    private static ArrayList<AbstractMyWindow> myWindows;
-    private static HashMap<String, HashMap<String, HashMap<String, Class>>> myClassesByApp;
+    public final static HashMap<String,AbstractMyWindow> myWindows = new HashMap<>();
 
     /**
      *
      * @return
      */
-    public static ArrayList<AbstractMyWindow> getMyWindows() {
-        myWindows = new ArrayList<>();
-        myClassesByApp = new HashMap<>();
-        myApps = new HashMap<>();
-        HashMap<String, HashMap<String, Class>> myClassesByName = new HashMap<>();
-
+    public static void initWindows() {
         File myWindowsClassesFile = new File("Extensions.txt");
-
         Scanner reader = null;
         try {
             reader = new Scanner(myWindowsClassesFile);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            Class<? extends AbstractMyWindow> myWindow;
-            String appName = null;
-            int count = 0;
             while (reader.hasNextLine()) {
-                String[] appNameCumClasses = reader.nextLine().split(":");
-                switch (appNameCumClasses[0]) {
-                    case "ApplicationStart":
-                        appName = appNameCumClasses[1];
-                        myApps.put(appName, count);
-                        count++;
-                        myWindow = (Class<? extends AbstractMyWindow>) Class.forName(appName.toLowerCase() + "." + appName);
-                        try {
-                            myWindows.add((AbstractMyWindow) myWindow.newInstance());
-                        } catch (InstantiationException | IllegalAccessException ex) {
-                            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        break;
-                    case "ApplicationEnd":
-                        myClassesByApp.put(appName, myClassesByName);
-                        break;
-                    default:
-                        String[] classes = appNameCumClasses[1].split(",");
-
-                        HashMap<String, Class> classNameClasses = new HashMap<>();
-                        for (String className : classes) {
-                            classNameClasses.put(className, Class.forName(appName.toLowerCase() + "." + className));
-                        }
-                        myClassesByName.put(appNameCumClasses[0], classNameClasses);
-                        break;
-                }
+                String appName = reader.nextLine();
+                Class myWindow = Class.forName(appName.toLowerCase() + "." + appName);
+                myWindows.put(appName,(AbstractMyWindow) myWindow.newInstance());
             }
-        } catch (ClassNotFoundException ex) {
+        } catch (FileNotFoundException | InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
             Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         reader.close();
-        return myWindows;
     }
 
     /**
@@ -85,18 +46,18 @@ public class Extensions {
      */
     public static void windowByName(String name) {
         String[] appName = name.split(":");
-        if (appName.length == 3) {
-            AbstractGUI window = null;
-            try {
-                //Example : When name is 'Newslo:Subscriber:SubscriberListWindow' then Appname is 'newslo.Newslo' and SubItem is 'Subscriber'.
-                window = (AbstractGUI) myClassesByApp.get(appName[0]).get(appName[1]).get(appName[2]).newInstance();
-            } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            if (appName.length == 3) {
+                Class app = Class.forName(appName[0].toLowerCase() + "." + appName[2]);
+                AbstractGUI window = (AbstractGUI) app.newInstance();
+                MainPanel.changePanel(window, window.getString());
+            } else {
+                Class app = Class.forName(name.toLowerCase() + "." + name);
+                AbstractMyWindow myWindow = (AbstractMyWindow) app.newInstance();
+                MainPanel.changePanel(myWindow, myWindow.getString());
             }
-            MainPanel.changePanel(window, window.getString());
-        } else {
-            AbstractMyWindow myWindow = myWindows.get(myApps.get(name));
-            MainPanel.changePanel(myWindow, myWindow.getString());
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -138,12 +99,12 @@ public class Extensions {
         }
 
         String[] appName = name.split(":");
-        System.out.println(name+"   "+myClassesByApp.get(appName[0]).get(appName[1]).get(appName[2]));
 
         AbstractGUI window = null;
         try {
-            window = (AbstractGUI) myClassesByApp.get(appName[0]).get(appName[1]).get(appName[2]).getDeclaredConstructor(parameterTypes).newInstance(parameters);
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
+            Class app = Class.forName(appName[0].toLowerCase() + "." + appName[2]);
+            window = (AbstractGUI) app.getDeclaredConstructor(parameterTypes).newInstance(parameters);
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException | ClassNotFoundException ex) {
             Logger.getLogger(Extensions.class.getName()).log(Level.SEVERE, null, ex);
         }
         MainPanel.changePanel(window, window.getString());
@@ -152,5 +113,4 @@ public class Extensions {
     public static File getMyFile(String name) {
         return new File(name);
     }
-
 }

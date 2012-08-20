@@ -7,12 +7,12 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -26,7 +26,7 @@ public class CollapsiblePanel {
 
     private static final JPanel buttonsPanel = new JPanel();
     private static MyMouseListener mouseListener = new MyMouseListener();
-    private static final int frameHeight = MainPanel.screenSize.height;
+    private static int frameHeight = MainPanel.screenSize.height;
     private static final int frameWidth = MainPanel.screenSize.width;
     private static final int hidden_width = (int) (0.15 * frameWidth);
     private final static JLayeredPane layeredPane = new JLayeredPane();
@@ -53,14 +53,13 @@ public class CollapsiblePanel {
         height = 0;
         buttonsPanel.removeAll();
         //Adds the menu items in the sidebar.
-        final ArrayList<AbstractMyWindow> myWindows = Extensions.getMyWindows();
-        if (!myWindows.isEmpty()) {
-            for (AbstractMyWindow myWindow : myWindows) {
-                JButton button = getButton(myWindow.getButtonName(), myWindow);
-                button.setFont(MainPanel.font.deriveFont(20f));
-                buttonsPanel.add(button);
-                height += 40;
-            }
+
+        for (Map.Entry<String, AbstractMyWindow> entry : Extensions.myWindows.entrySet()) {
+            AbstractMyWindow myWindow = entry.getValue();
+            JButton button = getButton(myWindow.getButtonName(), myWindow);
+            button.setFont(MainPanel.font.deriveFont(20f));
+            buttonsPanel.add(button);
+            height += 40;
         }
 
         addDefaultButtons();
@@ -86,7 +85,11 @@ public class CollapsiblePanel {
                 if (flag) {
                     flag = false;
                     final String appName = strings[0];
-                    final JButton button = appButton(appName);
+                    AbstractMyWindow myWindow = Extensions.myWindows.get(appName);
+                    JButton button = getButton(myWindow.getButtonName(), myWindow);
+                    button.setBackground(new Color(50, 50, 50));
+                    button.setForeground(Color.white);
+                    button.setFont(MainPanel.font.deriveFont(20f));
                     buttonsPanel.add(button);
                     height += 40;
                 }
@@ -101,7 +104,6 @@ public class CollapsiblePanel {
                 buttonsPanel.add(button);
                 height += 35;
             }
-            System.out.println(height);
         }
 
         addDefaultButtons();
@@ -177,31 +179,6 @@ public class CollapsiblePanel {
 
     /**
      *
-     * @param appName
-     * @return
-     */
-    private static JButton appButton(final String appName) {
-        JButton button = new JButton(appName);
-        button.setBackground(new Color(50, 50, 50));
-        button.setForeground(Color.white);
-        button.setFont(MainPanel.font.deriveFont(20f));
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setOpaque(true);
-        button.setPreferredSize(new Dimension(hidden_width, 30));
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                Extensions.windowByName(appName);
-            }
-        });
-        return button;
-    }
-
-    /**
-     *
      */
     private static class MyActionListener implements ActionListener {
 
@@ -210,7 +187,6 @@ public class CollapsiblePanel {
         private final Timer timer = new Timer(10, this);
 
         public void start() {
-            //timer.setInitialDelay(1000);
             timer.start();
         }
 
@@ -255,8 +231,7 @@ public class CollapsiblePanel {
                 point = button.getLocation();
                 button.setBackground(new Color(20, 20, 20));
             }
-            Rectangle rect = new Rectangle(0, 0, hidden_width, frameHeight);
-            if (!showAlways && !rect.contains(point.x + event.getX(), point.y + event.getY())) {
+            if (!showAlways && !layeredPane.contains(point.x + event.getX(), point.y + event.getY())) {
                 buttonsPanel.setVisible(false);
                 buttonsPanel.setBounds(frameWidth, 0, hidden_width, frameHeight);
             }

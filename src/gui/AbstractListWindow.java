@@ -7,8 +7,8 @@ import java.io.File;
 import java.util.ArrayList;
 import javax.swing.*;
 import utility.Extensions;
-import utility.MainPanel;
 import utility.FileEdit;
+import utility.MainPanel;
 import utility.SearchFiles;
 
 /**

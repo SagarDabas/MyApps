@@ -11,8 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import utility.Extensions;
-import utility.MainPanel;
 import utility.FileEdit;
+import utility.MainPanel;
 
 /**
  *

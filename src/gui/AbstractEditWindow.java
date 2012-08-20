@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 import utility.Extensions;
-import utility.MainPanel;
 import utility.FileEdit;
+import utility.MainPanel;
 import utility.SearchFiles;
 import utility.Validator;
 
@@ -116,9 +116,7 @@ public abstract class AbstractEditWindow<T extends FileInterface> extends Abstra
             @Override
             public void actionPerformed(final ActionEvent event) {
                 if (index != -1) {
-//                    Class[] classes = {ArrayList.class, int.class};
-                    Object[] parameters = {list, index};
-                    Extensions.windowByName(infoWindow, parameters);
+                    Extensions.windowByName(infoWindow, list, index);
                 } else {
                     Extensions.windowByName(listWindow);
                 }
