@@ -1,7 +1,6 @@
 # MyApps
 
-I created this when I was learning Java and OOP analysis and design. It is basically a UI designing library in Java. I made the UI look like
-Windows 8.
+I created this as a library for my Java projects when I was learning Java and OOP analysis and design. It is almost Windows 8 UI design :) in Java.
 
 Sorry not the whole code is here.
 
